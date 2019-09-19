@@ -8,7 +8,7 @@
 
 <script>
 export default {
-    name: "TodiItem",
+    name: "TodoItem",
     props: ["todo"],
     methods: {
         markComplete() {

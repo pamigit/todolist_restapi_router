@@ -1,46 +1,49 @@
 <template>
   <div class="home">
     <Header />
-    <Todos v-bind:todos="todos" v-on:del-todo="delTodo"/>
+    <div class="container">
+      <AddTodo v-on:add-todo="addTodo"/>
+      <Todos v-bind:todos="todos" v-on:del-todo="delTodo"/>
+    </div>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
 import Todos from "../components/Todos";
-import Header from "../components/layout/Header"
+import Header from "../components/layout/Header";
+import AddTodo from "../components/AddTodo";
+import axios from "axios";
 
 export default {
   name: 'home',
   components: {
     Todos,
-    Header
+    Header,
+    AddTodo
   },
   data() {
     return {
-      todos: [
-        {
-          id: 1,
-          title: "Wash car",
-          completed: false
-        },
-        {
-          id: 2,
-          title: "Go to dentist",
-          completed: false
-        },
-        {
-          id: 3,
-          title: "Buy pampers",
-          completed: false
-        }
-      ]
+      todos: []
     }
   },
   methods: {
     delTodo(id) {
-        this.todos = this.todos.filter(todo => todo.id !== id);
+      axios.delete('https://jsonplaceholder.typicode.com/todos/${id}')
+        .then(res => this.todos = this.todos.filter(todo => todo.id !== id))
+        .catch(err => console.log(err));
+    },
+    addTodo(item) {
+      if (item.title !== '') {
+        axios.post('https://jsonplaceholder.typicode.com/todos', item)
+          .then(res => this.todos = [...this.todos, res.data])
+          .catch(err => console.log(err));
+      }
     }
+  },
+  created() {
+    axios.get("https://jsonplaceholder.typicode.com/todos?_limit=10")
+      .then(res => this.todos = res.data)
+      .catch(err => console.log(err));
   }
 }
 </script>
